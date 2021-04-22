@@ -8,38 +8,37 @@ import rand
 
 struct App {
 mut:
-	tui &tui.Context = 0
+	tui    &tui.Context = 0
+	prompt &Prompt
 }
 
-fn event(e &tui.Event, x voidptr) {
-	mut app := &App(x)
+fn event(e &tui.Event, mut app App) {
+	// mut app := &App(x)
 	println(e)
-	if e.typ == .key_down && e.code == .escape {
-		exit(0)
+	match e.typ {
+		.key_down {
+			match e.code {
+				.escape {
+					exit(0)
+				}
+				32...126 { // 0-9a-zA-Z
+					app.prompt.input(e.ascii, app.prompt.cursor_line, app.prompt.cursor_column)
+				}
+				else {}
+			}
+		}
+		else {}
 	}
-}
-
-fn frame(x voidptr) {
-	mut app := &App(x)
-	width, height := term.get_terminal_size()
-
-	app.tui.clear()
-
-	mut t_lines := load_dict(os.dir(os.executable()) + '/words', 100)
-	paragaph := random_paragraph(t_lines, 10)
-
-	for i, l in paragaph {
-		l.print(width / 2, height / 2 + i, mut app)
-	}
-	term.show_cursor() // TODO: Bad spot.
-	term.set_cursor_position(term.Coord{10, 8})
-
-	app.tui.reset()
-	app.tui.flush()
 }
 
 fn main() {
-	mut app := &App{}
+	mut t_lines := load_dict(os.dir(os.executable()) + '/words', 100)
+	paragaph := random_paragraph(t_lines, 10)
+	mut app := &App{
+		prompt: &Prompt(Quote{
+			lines: paragaph
+		})
+	}
 	app.tui = tui.init(
 		user_data: app
 		event_fn: event
@@ -48,6 +47,24 @@ fn main() {
 		frame_rate: 60
 	)
 	app.tui.run() ?
+}
+
+fn frame(mut app App) {
+	width, height := term.get_terminal_size()
+
+	app.tui.clear()
+
+	for i, line in app.prompt.lines {
+		line.print(width / 2, height / 2 + i, mut app)
+	}
+
+	app.tui.reset()
+	app.tui.flush()
+
+	term.set_cursor_position(term.Coord{
+		width / 2 - app.prompt.lines[app.prompt.cursor_line].len / 2 + app.prompt.cursor_column,
+		height / 2 + app.prompt.cursor_line})
+	term.show_cursor()
 }
 
 fn load_dict(file string, cap int) []string {
@@ -80,6 +97,40 @@ fn random_paragraph(dict []string, word_count u32) []LineBuffer {
 		paragaph << temp_line
 	}
 	return paragaph
+}
+
+interface Prompt {
+mut:
+	cursor_line int
+	cursor_column int
+	lines []LineBuffer
+}
+
+fn (mut p Prompt) input(char rune, row int, column int) {
+	if p.lines[row].text[column].chr == char {
+		p.lines[row].text[column].col_fn = term.black
+	} else {
+		p.lines[row].text[column].col_fn = term.red
+	}
+	if p.cursor_column < p.lines[row].len - 1 {
+		p.cursor_column += 1
+	} else {
+		p.cursor_line += 1
+		p.cursor_column = 0
+	}
+}
+
+struct Quote {
+mut:
+	cursor_line   int
+	cursor_column int
+	lines         []LineBuffer
+	link          Url
+}
+
+struct Url {
+	url  string
+	text string
 }
 
 struct Char {
