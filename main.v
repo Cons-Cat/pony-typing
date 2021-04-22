@@ -2,7 +2,9 @@ module main
 
 import term
 import term.ui as tui
+import io
 import os
+import rand
 
 struct App {
 mut:
@@ -19,24 +21,18 @@ fn event(e &tui.Event, x voidptr) {
 
 fn frame(x voidptr) {
 	mut app := &App(x)
+	width, height := term.get_terminal_size()
 
 	app.tui.clear()
-	// app.tui.set_bg_color(r: 63, g: 81, b: 181)
-	// app.tui.draw_rect(20, 6, 41, 10)
-	app.tui.draw_text(24, 2, 'Hello from V!')
-	// app.tui.set_cursor_position(0, 0)
 
-	mut t_lines := []LineBuffer{}
-	mut l_one := LineBuffer{}
-	l_one.push_word('min ')
-	l_one.push_word('maximum')
-	t_lines << l_one
+	mut t_lines := load_dict(os.dir(os.executable()) + '/words', 100)
+	paragaph := random_paragraph(t_lines, 10)
 
-	for l in t_lines {
-		l.print(20, 8, mut app)
+	for i, l in paragaph {
+		l.print(width / 2, height / 2 + i, mut app)
 	}
 	term.show_cursor() // TODO: Bad spot.
-	term.set_cursor_position(term.Coord{10,8})
+	term.set_cursor_position(term.Coord{10, 8})
 
 	app.tui.reset()
 	app.tui.flush()
@@ -52,6 +48,38 @@ fn main() {
 		frame_rate: 60
 	)
 	app.tui.run() ?
+}
+
+fn load_dict(file string, cap int) []string {
+	mut lines := []string{}
+	mut f := os.open(file) or { panic(err) }
+	defer {
+		f.close()
+	}
+	mut r := io.new_buffered_reader(reader: io.make_reader(f), cap: cap)
+	for {
+		l := r.read_line() or { break }
+		lines << l
+	}
+	return lines
+}
+
+fn random_paragraph(dict []string, word_count u32) []LineBuffer {
+	mut paragaph := []LineBuffer{}
+	mut words := 0
+	for words < word_count {
+		mut temp_line := LineBuffer{}
+		for i in 0 .. 4 {
+			temp_line.push_word(dict[rand.int_in_range(0, dict.len)] + if i < 4 {
+				' '
+			} else {
+				''
+			})
+			words += 1
+		}
+		paragaph << temp_line
+	}
+	return paragaph
 }
 
 struct Char {
@@ -73,7 +101,7 @@ mut:
 
 fn (b LineBuffer) print(x int, y int, mut app App) {
 	for i in 0 .. b.len {
-		app.tui.draw_text(x + b.len / 2 + i, y,b.text[i].col_fn(b.text[i].chr.str()))
+		app.tui.draw_text(x - b.len / 2 + i, y, b.text[i].col_fn(b.text[i].chr.str()))
 	}
 }
 
