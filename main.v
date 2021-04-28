@@ -24,6 +24,9 @@ fn event(e &tui.Event, mut app App) {
 				32...126 { // 0-9a-zA-Z
 					app.prompt.input(e.ascii, app.prompt.cursor_line, app.prompt.cursor_column)
 				}
+            .backspace {
+					app.prompt.backspace(app.prompt.cursor_line, app.prompt.cursor_column)
+            }
 				else {}
 			}
 		}
@@ -120,6 +123,11 @@ fn (mut p Prompt) input(char rune, row int, column int) {
 	}
 }
 
+fn (mut p Prompt) backspace(row int, column int) {
+	p.lines[row].text[column-1].col_fn = term.white
+	p.cursor_column -= 1
+}
+
 struct Quote {
 mut:
 	cursor_line   int
@@ -165,3 +173,4 @@ fn (mut b LineBuffer) push_word(word string) {
 	b.len += word.len
 	b.word_ind += 1
 }
+
