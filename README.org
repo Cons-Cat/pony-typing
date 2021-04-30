@@ -1,0 +1,19 @@
+This is an early WIP touch-typing program written in V. I envision it as a cross-platform (Win10/GNU/Mac) console application.
+It should render images with multiple supported protocols (sixel, Kitty, w3m, iterm's, etc.).
+The typing interfaces should be inspired by keybr.com, monkeytype.com, and typingclub.com
+
+* Why Another One?
+Existing touch-typing trainers have several problems.
+The sophisticated ones attempt to teach typing incrementally by focusing on home-row and bigrams, but those assume a QWERTY layout.
+Some provide support for alternatives like Colemak, but no typing trainer can possibly keep up with trends and cutting-edge layouts.
+
+Even if they could, there is another problem. QMK keyboards are constantly increasing in popularity, and features like
+combos and tap dance that fundamentally alter the way letters are inputted for improved ergonomics are difficult to account for.
+
+There is no general solution to this besides allowing users to input an arbitrary keyboard layout, and adapting the lessons
+programatically for whatever data they provide.
+
+It is also challenging to quantify word frequency for informing lessons. Many typing tutors use Google Books as a source
+of English to assess word frequency, because it is a sizable and accessible repository of modern English text.
+However, this is a naive source because most texts it contains do not reflect the real text that humans mostly read and write.
+For that reason, I will aggregate word frequency from fimfiction.net.
