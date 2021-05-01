@@ -102,10 +102,3 @@ pub fn (mut b LineBuffer) push_word(word string) {
 	b.len += word.len
 	b.word_ind += 1
 }
-
-// pub fn (b LineBuffer) get_rune(x int, y int) Char {
-// return b.text[i].col_fn(b.text[i].chr.str())
-// for i in 0 .. b.len {
-// 	app.tui.draw_text(x - b.len / 2 + i, y, b.text[i].col_fn(b.text[i].chr.str()))
-// }
-// }

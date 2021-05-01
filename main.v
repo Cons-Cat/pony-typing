@@ -57,9 +57,10 @@ fn frame(mut app App) {
 
 	for i, line in app.prompt.lines {
 		for j in 0 .. line.len {
-			app.tui.draw_text(width / 2 - line.len / 2 + j, height / 2 + i, line.text[j].col_fn(line.text[j].chr.str()))
+			raw_char := line.text[j].chr.str()
+			smart_char := if raw_char == ' ' { '␣' } else { raw_char }
+			app.tui.draw_text(width / 2 - line.len / 2 + j, height / 2 + i, line.text[j].col_fn(smart_char))
 		}
-		// line.print(width / 2, height / 2 + i, mut app)
 	}
 
 	app.tui.reset()
