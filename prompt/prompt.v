@@ -82,6 +82,21 @@ pub mut:
 	chr    rune
 }
 
+pub fn (c Char) str() string {
+	return c.col_fn(c.chr.str())
+}
+
+pub fn make_char_from_str(s string) []Char {
+	mut return_str := []Char{len: s.len}
+	for i, c in s {
+		return_str[i] = Char{
+			col_fn: term.cyan
+			chr: rune(c)
+		}
+	}
+	return return_str
+}
+
 pub struct LineBuffer {
 pub mut:
 	len int
