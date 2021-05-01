@@ -1,10 +1,11 @@
 module menu
 
-import context as ctx
+// import context as ctx
+import term.ui as tui
 import prompt
 
 pub interface DrawableItems {
-	draw(&ctx.App, int, int)
+	draw(&tui.Context, int, int)
 }
 
 pub struct Label {
@@ -16,15 +17,16 @@ pub mut:
 	fg   fn (string) string
 }
 
-pub fn (l Label) draw(mut app ctx.App, x int, y int) {
-	app.draw_char_array(l.text, l.x + x, l.y + y)
+pub fn (l Label) draw(mut ctx tui.Context, x int, y int) {
+	// app.draw_char_array(l.text, l.x + x, l.y + y)
+	// TODO: Draw_Text
 }
 
 pub interface Button {
 	press fn ()
 	label Label
 	update()
-	draw(&ctx.App)
+	draw(&tui.Context)
 }
 
 // TODO: BasicButton
@@ -47,9 +49,9 @@ pub mut:
 	anchor Anchor
 }
 
-pub fn (b Box) draw(mut app ctx.App, x int, y int) {
+pub fn (b Box) draw(mut ctx tui.Context, x int, y int) {
 	for i, item in b.items {
-		item.draw(app, x, y + i)
+		item.draw(ctx, x, y + i)
 	}
 }
 
@@ -66,8 +68,8 @@ pub mut:
 	boxes  []Box
 }
 
-pub fn (c Container) draw(mut app ctx.App) {
+pub fn (c Container) draw(mut ctx tui.Context) {
 	for _, box in c.boxes {
-		box.draw(mut app, c.x, c.y)
+		box.draw(mut ctx, c.x, c.y)
 	}
 }

@@ -33,11 +33,34 @@ fn main() {
 	mut t_lines := prmpt.load_dict(os.dir(os.executable()) + '/words', 100)
 	paragaph := prmpt.random_paragraph(t_lines, 10)
 
+	// Instantiate UI
+	mut ui_box := menu.Box{
+		x: 0
+		y: 0
+		anchor: .tl
+	}
+
+	ui_box.items << menu.Label{
+		text: prmpt.make_char_from_str('TAB')
+		x: 0
+		y: 0
+		bg: term.yellow
+		fg: term.cyan
+	}
+
+	mut ui := &menu.Container{
+		x: 0
+		y: 0
+		layout: menu.Layout.vert
+		boxes: [ui_box]
+	}
+
 	// Instantiate context.
 	mut app := &ctx.App{
 		prompt: &prmpt.Prompt(prmpt.Quote{
 			lines: paragaph
 		})
+		menu: ui
 	}
 	app.tui = tui.init(
 		user_data: app
@@ -46,29 +69,6 @@ fn main() {
 		hide_cursor: false
 		frame_rate: 60
 	)
-
-	// Instantiate UI
-	mut ui_box := menu.Box{
-		x: 0
-		y: 0
-		anchor: .tl
-	}
-	tab_text := prmpt.make_char_from_str('TAB')
-
-	ui_box.items << menu.Label{
-		text: tab_text
-		x: 0
-		y: 0
-		bg: term.yellow
-		fg: term.cyan
-	}
-
-	mut ui := &menu.container{
-		x: 0
-		y: 0
-		layout: menu.layout.vert
-		boxes: [ui_box]
-	}
 
 	// Run game loop
 	app.tui.run() ?
@@ -80,6 +80,7 @@ fn frame(mut app ctx.App) {
 	app.tui.clear()
 
 	print_prompt(mut app)
+	app.menu.draw(mut app.tui)
 
 	app.tui.reset()
 	app.tui.flush()
