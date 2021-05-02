@@ -41,10 +41,10 @@ fn main() {
 	}
 
 	ui_box.items << menu.Label{
-		text: prmpt.make_char_from_str('TAB')
+		text: 'TAB'
 		x: 0
 		y: 0
-		bg: term.yellow
+		bg: term.black
 		fg: term.cyan
 	}
 

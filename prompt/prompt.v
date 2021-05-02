@@ -86,13 +86,21 @@ pub fn (c Char) str() string {
 	return c.col_fn(c.chr.str())
 }
 
-pub fn make_char_from_str(s string) []Char {
+pub fn make_chars_from_str(s string) []Char {
 	mut return_str := []Char{len: s.len}
 	for i, c in s {
 		return_str[i] = Char{
 			col_fn: term.cyan
 			chr: rune(c)
 		}
+	}
+	return return_str
+}
+
+pub fn make_str_from_chars(chars []Char) string {
+	mut return_str := ''
+	for _, c in chars {
+		return_str = return_str + c.str()
 	}
 	return return_str
 }

@@ -10,16 +10,19 @@ pub interface DrawableItems {
 
 pub struct Label {
 pub mut:
-	text []prompt.Char
-	x    int
-	y    int
-	bg   fn (string) string
-	fg   fn (string) string
+	text     string
+	x        int
+	y        int
+	bg       fn (string) string
+	fg       fn (string) string
+	hover_bg fn (string) string
+	hover_fg fn (string) string
+	hover    bool
 }
 
 pub fn (l Label) draw(mut ctx tui.Context, x int, y int) {
-	// app.draw_char_array(l.text, l.x + x, l.y + y)
-	// TODO: Draw_Text
+	text := if l.hover { l.hover_bg(l.hover_fg(l.text)) } else { l.bg(l.fg(l.text)) }
+	ctx.draw_text(x, y, text)
 }
 
 pub interface Button {
@@ -51,7 +54,7 @@ pub mut:
 
 pub fn (b Box) draw(mut ctx tui.Context, x int, y int) {
 	for i, item in b.items {
-		item.draw(ctx, x, y + i)
+		item.draw(ctx, b.x + x, b.y + y + i)
 	}
 }
 
@@ -69,6 +72,7 @@ pub mut:
 }
 
 pub fn (c Container) draw(mut ctx tui.Context) {
+	// TODO: Account for layout
 	for _, box in c.boxes {
 		box.draw(mut ctx, c.x, c.y)
 	}
