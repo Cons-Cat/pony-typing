@@ -7,11 +7,11 @@ import menu
 
 pub struct App {
 pub mut:
-	tui    &tui.Context = 0
-	prompt &prmpt.Prompt
-	menu   &menu.Container
-	width  int
-	height int
+	tui        &tui.Context = 0
+	prompt     &prmpt.Prompt
+	menu_stack []&menu.Container
+	width      int
+	height     int
 }
 
 pub fn (mut app App) draw_char_array(text []prmpt.Char, x int, y int) {

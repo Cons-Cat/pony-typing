@@ -40,15 +40,20 @@ fn main() {
 		anchor: .tl
 	}
 
-	ui_box.items << menu.Label{
+	test_label := menu.Label{
 		text: 'TAB'
-		x: 0
-		y: 0
 		bg: term.black
 		fg: term.cyan
+		hover_bg: term.black
+		hover_fg: term.cyan
 	}
 
-	mut ui := &menu.Container{
+	ui_box.items << menu.BasicButton{
+		label: test_label
+		input: tui.KeyCode.tab
+	}
+
+	mut prompt_ui := &menu.Container{
 		x: 0
 		y: 0
 		layout: menu.Layout.vert
@@ -60,7 +65,7 @@ fn main() {
 		prompt: &prmpt.Prompt(prmpt.Quote{
 			lines: paragaph
 		})
-		menu: ui
+		menu_stack: [prompt_ui]
 	}
 	app.tui = tui.init(
 		user_data: app
@@ -80,7 +85,9 @@ fn frame(mut app ctx.App) {
 	app.tui.clear()
 
 	print_prompt(mut app)
-	app.menu.draw(mut app.tui)
+	for _, menu in app.menu_stack {
+		menu.draw(mut app.tui)
+	}
 
 	app.tui.reset()
 	app.tui.flush()

@@ -1,8 +1,7 @@
 module menu
 
-// import context as ctx
 import term.ui as tui
-import prompt
+// import prompt
 
 pub interface DrawableItems {
 	draw(&tui.Context, int, int)
@@ -11,8 +10,6 @@ pub interface DrawableItems {
 pub struct Label {
 pub mut:
 	text     string
-	x        int
-	y        int
 	bg       fn (string) string
 	fg       fn (string) string
 	hover_bg fn (string) string
@@ -25,14 +22,45 @@ pub fn (l Label) draw(mut ctx tui.Context, x int, y int) {
 	ctx.draw_text(x, y, text)
 }
 
+// Workaround for a v fmt bug.
+type KeyCode = tui.KeyCode
+
 pub interface Button {
-	press fn ()
+	// press fn ()
 	label Label
-	update()
-	draw(&tui.Context)
+	input KeyCode
+	draw(&tui.Context, int, int)
 }
 
-// TODO: BasicButton
+// TODO: This incurs a V compiler bug.
+// pub fn (b Button) update(e &tui.Event) {
+// 	if e.code == b.input {
+// 		b.press()
+// 	}
+// }
+
+pub struct BasicButton {
+pub mut:
+	press fn ()
+	label Label
+	input KeyCode
+}
+
+// TODO: Remove when above bug is fixed.
+pub fn (mut b BasicButton) update(e &tui.Event) {
+	if e.code == b.input {
+		b.press()
+	}
+}
+
+pub fn (b BasicButton) draw(mut ctx tui.Context, x int, y int) {
+	b.label.draw(mut ctx, x, y)
+}
+
+pub fn (mut b BasicButton) press() {
+	b.label.hover = !b.label.hover
+}
+
 pub enum Anchor {
 	t
 	b
