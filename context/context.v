@@ -5,11 +5,19 @@ import term.ui as tui
 import prompt as prmpt
 import menu
 
+enum UILayers {
+	prompt
+	sidebar
+	length
+}
+
 pub struct App {
 pub mut:
-	tui        &tui.Context = 0
-	prompt     &prmpt.Prompt
-	menu_stack []&menu.Container
+	tui    &tui.Context = 0
+	prompt &prmpt.Prompt
+	// TODO: Set size with UILayers.length
+	// This should work, but doesn't due to a compiler bug.
+	menu_stack [2]menu.Container
 	width      int
 	height     int
 }

@@ -53,19 +53,20 @@ fn main() {
 		input: tui.KeyCode.tab
 	}
 
-	mut prompt_ui := &menu.Container{
+	mut prompt_container := menu.Container{
 		x: 0
 		y: 0
 		layout: menu.Layout.vert
 		boxes: [ui_box]
 	}
+	mut sidebar_container := menu.Container{}
 
 	// Instantiate context.
 	mut app := &ctx.App{
 		prompt: &prmpt.Prompt(prmpt.Quote{
 			lines: paragaph
 		})
-		menu_stack: [prompt_ui]
+		menu_stack: [prompt_container, sidebar_container]!
 	}
 	app.tui = tui.init(
 		user_data: app
