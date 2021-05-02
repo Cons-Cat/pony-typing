@@ -42,7 +42,7 @@ fn main() {
 
 	test_label := menu.Label{
 		text: 'TAB'
-		bg: term.black
+		bg: term.white
 		fg: term.cyan
 		hover_bg: term.black
 		hover_fg: term.cyan
@@ -56,10 +56,20 @@ fn main() {
 	mut prompt_container := menu.Container{
 		x: 0
 		y: 0
-		layout: menu.Layout.vert
+		layout: .quad
 		boxes: [ui_box]
 	}
-	mut sidebar_container := menu.Container{}
+	prompt_container.width, prompt_container.height = term.get_terminal_size()
+
+	mut sidebar_container := menu.Container{
+		x: 0
+		y: 0
+		width: 20
+		layout: .vert
+		opaque: true
+		bg: term.bright_bg_white
+	}
+	_, sidebar_container.height = term.get_terminal_size()
 
 	// Instantiate context.
 	mut app := &ctx.App{

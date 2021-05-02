@@ -95,11 +95,24 @@ pub struct Container {
 pub mut:
 	x      int
 	y      int
+	width  int
+	height int
 	layout Layout
 	boxes  []Box
+	// TODO: sumtype with none?
+	opaque bool
+	bg     fn (string) string
 }
 
 pub fn (c Container) draw(mut ctx tui.Context) {
+	if c.opaque {
+		for i in 0 .. c.width {
+			for j in 0 .. c.height {
+				ctx.draw_text(c.x + i, c.y + j, c.bg(' '))
+				// ctx.draw_text(c.x + i, c.y + j, 'x')
+			}
+		}
+	}
 	// TODO: Account for layout
 	for _, box in c.boxes {
 		box.draw(mut ctx, c.x, c.y)
