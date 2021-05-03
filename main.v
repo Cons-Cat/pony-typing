@@ -33,26 +33,24 @@ fn main() {
 	mut t_lines := prmpt.load_dict(os.dir(os.executable()) + '/words', 100)
 	paragaph := prmpt.random_paragraph(t_lines, 10)
 
-	// Instantiate UI
+	// TODO: Extrapolate layer insantiation to functions.
+	// Instantiate first UI layer.
 	mut ui_box := menu.Box{
 		x: 0
 		y: 0
 		anchor: .tl
 	}
-
 	test_label := menu.Label{
 		text: 'TAB'
-		bg: term.white
+		bg: term.bright_bg_black
 		fg: term.cyan
-		hover_bg: term.black
+		hover_bg: term.bg_black
 		hover_fg: term.cyan
 	}
-
 	ui_box.items << menu.BasicButton{
 		label: test_label
-		input: tui.KeyCode.tab
+		input: .tab
 	}
-
 	mut prompt_container := menu.Container{
 		x: 0
 		y: 0
@@ -61,6 +59,80 @@ fn main() {
 	}
 	prompt_container.width, prompt_container.height = term.get_terminal_size()
 
+	// Instantiate second UI layer.
+	sidebar_type_items := [
+		menu.DrawableItems(menu.Label{
+			text: 'TYPE'
+			bg: term.bg_cyan
+			fg: term.black
+		}),
+		menu.DrawableItems(menu.BasicButton{
+			label: menu.Label {
+				text: 'Random'
+				bg: term.bright_bg_white
+				fg: term.black
+			},
+		}),
+		menu.DrawableItems(menu.BasicButton{
+			label: menu.Label {
+				text: 'Quotes'
+				bg: term.bright_bg_white
+				fg: term.black
+			},
+		}),
+	]
+	sidebar_learn_items := [
+		menu.DrawableItems(menu.Label{
+			text: 'LEARN'
+			bg: term.bg_cyan
+			fg: term.black
+		}),
+		menu.DrawableItems(menu.BasicButton{
+			label: menu.Label {
+				text: 'Lesson'
+				bg: term.bright_bg_white
+				fg: term.black
+			},
+		}),
+		menu.DrawableItems(menu.BasicButton{
+			label: menu.Label {
+				text: 'Pseudotext'
+				bg: term.bright_bg_white
+				fg: term.black
+			},
+		}),
+	]
+	sidebar_bonus_items := [
+		menu.DrawableItems(menu.Label{
+			text: 'BONUS'
+			bg: term.bg_cyan
+			fg: term.black
+		}),
+	]
+	sidebar_bottom_items := [
+		menu.DrawableItems(menu.BasicButton{
+			label: menu.Label {
+				text: 'TAB'
+				bg: term.bg_cyan
+				fg: term.black
+			},
+		}),
+	]
+	sidebar_boxes := [
+		menu.Box{
+			items: sidebar_type_items
+		},
+		menu.Box{
+			items: sidebar_learn_items
+		},
+		menu.Box{
+			items: sidebar_bonus_items
+		},
+		menu.Box{
+    		anchor: .bl
+			items: sidebar_bottom_items
+		},
+	]
 	mut sidebar_container := menu.Container{
 		x: 0
 		y: 0
@@ -68,6 +140,7 @@ fn main() {
 		layout: .vert
 		opaque: true
 		bg: term.bright_bg_white
+		boxes: sidebar_boxes
 	}
 	_, sidebar_container.height = term.get_terminal_size()
 
@@ -92,6 +165,8 @@ fn main() {
 
 fn frame(mut app ctx.App) {
 	app.width, app.height = term.get_terminal_size()
+	app.menu_stack[ctx.UILayers.prompt].width, app.menu_stack[ctx.UILayers.prompt].height = app.width,app.height+1
+	app.menu_stack[ctx.UILayers.sidebar].height = app.height+1
 
 	app.tui.clear()
 

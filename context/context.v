@@ -5,7 +5,7 @@ import term.ui as tui
 import prompt as prmpt
 import menu
 
-enum UILayers {
+pub enum UILayers {
 	prompt
 	sidebar
 	length
