@@ -36,8 +36,10 @@ fn main() {
 	mut prompt_container := make_prompt_ui()
 	prompt_container.width, prompt_container.height = term.get_terminal_size()
 
-	mut sidebar_container := make_sidebar_ui()
-	_, sidebar_container.height = term.get_terminal_size()
+	// mut sidebar_container := make_sidebar_ui()
+	// _, sidebar_container.height = term.get_terminal_size()
+	// sidebar_container.x = -sidebar_container.width
+	mut sidebar_container := menu.SuperContainer(menu.Container{})
 
 	// Instantiate context.
 	mut app := &ctx.App{
@@ -60,13 +62,14 @@ fn main() {
 
 fn frame(mut app ctx.App) {
 	app.width, app.height = term.get_terminal_size()
-	app.menu_stack[ctx.UILayers.prompt].width, app.menu_stack[ctx.UILayers.prompt].height = app.width,app.height+1
-	app.menu_stack[ctx.UILayers.sidebar].height = app.height+1
+	app.menu_stack[ctx.UILayers.prompt].width, app.menu_stack[ctx.UILayers.prompt].height = app.width,
+		app.height + 1
+	app.menu_stack[ctx.UILayers.sidebar].height = app.height + 1
 
 	app.tui.clear()
 
 	print_prompt(mut app)
-	for _, menu in app.menu_stack {
+	for _, mut menu in app.menu_stack {
 		menu.draw(mut app.tui)
 	}
 
@@ -89,15 +92,15 @@ fn print_prompt(mut app ctx.App) {
 	}
 }
 
-fn make_prompt_ui() menu.Container {
-	mut ui_box := menu.Box{
+fn make_prompt_ui() menu.SuperContainer {
+	mut ui_box := &menu.Box{
 		x: 0
 		y: 0
 		anchor: .bl
 	}
 	// TODO: Why does this need to be heap allocated?
 	// IIRC this is a bug related to interfaces.
-	test_label := menu.Label{
+	test_label := &menu.Label{
 		text: 'TAB'
 		bg: term.bright_bg_black
 		fg: term.cyan
@@ -108,7 +111,7 @@ fn make_prompt_ui() menu.Container {
 		label: test_label
 		input: .tab
 	}
-	return menu.Container{
+	return &menu.Container{
 		x: 0
 		y: 0
 		layout: .quad
@@ -116,8 +119,8 @@ fn make_prompt_ui() menu.Container {
 	}
 }
 
-fn make_sidebar_ui() menu.Container {
-	mut type_box := menu.Box {
+fn make_sidebar_ui() menu.SuperContainer {
+	mut type_box := &menu.Box{
 		anchor: .tl
 	}
 	type_box.items << &menu.Label{
@@ -140,7 +143,7 @@ fn make_sidebar_ui() menu.Container {
 		}
 	}
 
-	mut tab_box := menu.Box {
+	mut tab_box := &menu.Box{
 		anchor: .bl
 	}
 	tab_box.items << &menu.BasicButton{
@@ -152,10 +155,10 @@ fn make_sidebar_ui() menu.Container {
 	}
 
 	sidebar_boxes := [
-		type_box
-		tab_box
+		type_box,
+		tab_box,
 	]
-	return menu.Container{
+	return &menu.Container{
 		x: 0
 		y: 0
 		width: 20
@@ -165,3 +168,11 @@ fn make_sidebar_ui() menu.Container {
 		boxes: sidebar_boxes
 	}
 }
+
+struct SidePanel {
+	menu.Container
+	toggle bool
+	// TODO: Acceleration / Velocity
+}
+
+fn slide_panel(mut panel menu.Container) {}

@@ -17,9 +17,10 @@ pub mut:
 	prompt &prmpt.Prompt
 	// TODO: Set size with UILayers.length
 	// This should work, but doesn't due to a compiler bug.
-	menu_stack [2]menu.Container
-	width      int
-	height     int
+	menu_stack     [2]menu.SuperContainer
+	sidebar_toggle bool
+	width          int
+	height         int
 }
 
 pub fn (mut app App) draw_char_array(text []prmpt.Char, x int, y int) {
