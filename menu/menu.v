@@ -75,18 +75,16 @@ pub mut:
 
 pub fn (b Box) draw(mut ctx ui.Context, x int, y int, width int, height int) {
 	// TODO: Complete anchoring
-	match b.anchor {
-		.tl {
-        	for i, item in b.items {
+	for i, item in b.items {
+    	match b.anchor {
+    		.tl {
         		item.draw(ctx, x, y + i)
         	}
-		}
-		.bl {
-			for i, item in b.items {
+    		.bl {
 				item.draw(ctx, b.x + x, y + height - b.items.len - i + 1)
 			}
+    		else { }
 		}
-		else { }
 	}
 }
 

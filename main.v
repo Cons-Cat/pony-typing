@@ -33,115 +33,10 @@ fn main() {
 	mut t_lines := prmpt.load_dict(os.dir(os.executable()) + '/words', 100)
 	paragaph := prmpt.random_paragraph(t_lines, 10)
 
-	// TODO: Extrapolate layer insantiation to functions.
-	// Instantiate first UI layer.
-	mut ui_box := menu.Box{
-		x: 0
-		y: 0
-		anchor: .tl
-	}
-	test_label := menu.Label{
-		text: 'TAB'
-		bg: term.bright_bg_black
-		fg: term.cyan
-		hover_bg: term.bg_black
-		hover_fg: term.cyan
-	}
-	ui_box.items << menu.BasicButton{
-		label: test_label
-		input: .tab
-	}
-	mut prompt_container := menu.Container{
-		x: 0
-		y: 0
-		layout: .quad
-		boxes: [ui_box]
-	}
+	mut prompt_container := make_prompt_ui()
 	prompt_container.width, prompt_container.height = term.get_terminal_size()
 
-	// Instantiate second UI layer.
-	sidebar_type_items := [
-		menu.DrawableItems(menu.Label{
-			text: 'TYPE'
-			bg: term.bg_cyan
-			fg: term.black
-		}),
-		menu.DrawableItems(menu.BasicButton{
-			label: menu.Label {
-				text: 'Random'
-				bg: term.bright_bg_white
-				fg: term.black
-			},
-		}),
-		menu.DrawableItems(menu.BasicButton{
-			label: menu.Label {
-				text: 'Quotes'
-				bg: term.bright_bg_white
-				fg: term.black
-			},
-		}),
-	]
-	sidebar_learn_items := [
-		menu.DrawableItems(menu.Label{
-			text: 'LEARN'
-			bg: term.bg_cyan
-			fg: term.black
-		}),
-		menu.DrawableItems(menu.BasicButton{
-			label: menu.Label {
-				text: 'Lesson'
-				bg: term.bright_bg_white
-				fg: term.black
-			},
-		}),
-		menu.DrawableItems(menu.BasicButton{
-			label: menu.Label {
-				text: 'Pseudotext'
-				bg: term.bright_bg_white
-				fg: term.black
-			},
-		}),
-	]
-	sidebar_bonus_items := [
-		menu.DrawableItems(menu.Label{
-			text: 'BONUS'
-			bg: term.bg_cyan
-			fg: term.black
-		}),
-	]
-	sidebar_bottom_items := [
-		menu.DrawableItems(menu.BasicButton{
-			label: menu.Label {
-				text: 'TAB'
-				bg: term.bg_cyan
-				fg: term.black
-			},
-		}),
-	]
-	sidebar_boxes := [
-		menu.Box{
-			items: sidebar_type_items
-		},
-		menu.Box{
-			items: sidebar_learn_items
-		},
-		menu.Box{
-			items: sidebar_bonus_items
-		},
-		menu.Box{
-    		anchor: .bl
-			items: sidebar_bottom_items
-		},
-	]
-	mut sidebar_container := menu.Container{
-		x: 0
-		y: 0
-		width: 20
-		layout: .vert
-		opaque: true
-		bg: term.bright_bg_white
-		boxes: sidebar_boxes
-	}
+	mut sidebar_container := make_sidebar_ui()
 	_, sidebar_container.height = term.get_terminal_size()
 
 	// Instantiate context.
@@ -191,5 +86,82 @@ fn print_prompt(mut app ctx.App) {
 			smart_char := if raw_char == ' ' { '␣' } else { raw_char }
 			app.tui.draw_text(app.width / 2 - line.len / 2 + j, app.height / 2 + i, line.text[j].col_fn(smart_char))
 		}
+	}
+}
+
+fn make_prompt_ui() menu.Container {
+	mut ui_box := menu.Box{
+		x: 0
+		y: 0
+		anchor: .bl
+	}
+	// TODO: Why does this need to be heap allocated?
+	// IIRC this is a bug related to interfaces.
+	test_label := menu.Label{
+		text: 'TAB'
+		bg: term.bright_bg_black
+		fg: term.cyan
+		hover_bg: term.bg_black
+		hover_fg: term.cyan
+	}
+	ui_box.items << &menu.BasicButton{
+		label: test_label
+		input: .tab
+	}
+	return menu.Container{
+		x: 0
+		y: 0
+		layout: .quad
+		boxes: [ui_box]
+	}
+}
+
+fn make_sidebar_ui() menu.Container {
+	mut type_box := menu.Box {
+		anchor: .tl
+	}
+	type_box.items << &menu.Label{
+		text: 'TYPE'
+		bg: term.bg_cyan
+		fg: term.black
+	}
+	type_box.items << &menu.BasicButton{
+		label: menu.Label{
+			text: 'Random'
+			bg: term.bright_bg_white
+			fg: term.black
+		}
+	}
+	type_box.items << &menu.BasicButton{
+		label: menu.Label{
+			text: 'Quotes'
+			bg: term.bright_bg_white
+			fg: term.black
+		}
+	}
+
+	mut tab_box := menu.Box {
+		anchor: .bl
+	}
+	tab_box.items << &menu.BasicButton{
+		label: menu.Label{
+			text: 'TAB'
+			bg: term.bg_cyan
+			fg: term.black
+		}
+	}
+
+	sidebar_boxes := [
+		type_box
+		tab_box
+	]
+	return menu.Container{
+		x: 0
+		y: 0
+		width: 20
+		layout: .vert
+		opaque: true
+		bg: term.bright_bg_white
+		boxes: sidebar_boxes
 	}
 }
