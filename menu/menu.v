@@ -5,6 +5,7 @@ import term.ui as tui
 
 pub interface DrawableItems {
 	draw(&tui.Context, int, int)
+	update(&tui.Event)
 }
 
 pub struct Label {
@@ -22,11 +23,14 @@ pub fn (l Label) draw(mut ctx tui.Context, x int, y int) {
 	ctx.draw_text(x, y, text)
 }
 
+fn (l Label) update(e &tui.Event) {}
+
 pub interface Button {
 	// press fn ()
 	label Label
 	input tui.KeyCode
 	draw(&tui.Context, int, int)
+	update(&tui.Event)
 }
 
 // TODO: This incurs a V compiler bug.
@@ -38,25 +42,26 @@ pub interface Button {
 
 pub struct BasicButton {
 pub mut:
+	// press fn (mut voidptr)
 	press fn ()
 	label Label
 	input tui.KeyCode
 }
 
-// TODO: Remove when above bug is fixed.
 pub fn (mut b BasicButton) update(e &tui.Event) {
-	if e.code == tui.KeyCode(b.input) {
+	if e.code == b.input {
 		b.press()
 	}
 }
 
+// TODO: Remove when above bug is fixed.
 pub fn (b BasicButton) draw(mut ctx tui.Context, x int, y int) {
 	b.label.draw(mut ctx, x, y)
 }
 
-pub fn (mut b BasicButton) press() {
-	b.label.hover = !b.label.hover
-}
+// pub fn (mut b BasicButton) press() {
+// 	b.label.hover = !b.label.hover
+// }
 
 pub enum Anchor {
 	tl
@@ -124,6 +129,14 @@ pub fn (c Container) draw(mut ctx tui.Context) {
 	}
 }
 
+pub fn (c Container) update(e &tui.Event) {
+	for box in c.boxes {
+		for item in box.items {
+			item.update(e)
+		}
+	}
+}
+
 pub interface SuperContainer {
 mut:
 	x int
@@ -133,4 +146,5 @@ mut:
 	layout Layout
 	boxes []&Box
 	draw(mut ctx tui.Context)
+	update(&tui.Event)
 }

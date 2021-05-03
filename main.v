@@ -7,27 +7,6 @@ import prompt as prmpt
 import context as ctx
 import menu
 
-fn event(e &tui.Event, mut app ctx.App) {
-	println(e)
-	match e.typ {
-		.key_down {
-			match e.code {
-				.escape {
-					exit(0)
-				}
-				32...126 { // 0-9a-zA-Z
-					app.prompt.input(e.ascii, app.prompt.cursor_line, app.prompt.cursor_column)
-				}
-				.backspace {
-					app.prompt.backspace(app.prompt.cursor_line, app.prompt.cursor_column)
-				}
-				else {}
-			}
-		}
-		else {}
-	}
-}
-
 fn main() {
 	// Initial prompt.
 	mut t_lines := prmpt.load_dict(os.dir(os.executable()) + '/words', 100)
@@ -60,6 +39,31 @@ fn main() {
 	app.tui.run() ?
 }
 
+fn event(e &tui.Event, mut app ctx.App) {
+	// Match typing prompt input.
+	match e.typ {
+		.key_down {
+			match e.code {
+				.escape {
+					exit(0)
+				}
+				32...126 { // 0-9a-zA-Z
+					app.prompt.input(e.ascii, app.prompt.cursor_line, app.prompt.cursor_column)
+				}
+				.backspace {
+					app.prompt.backspace(app.prompt.cursor_line, app.prompt.cursor_column)
+				}
+				else {}
+			}
+		}
+		else {}
+	}
+	// Update UI elements.
+	for mut menu in app.menu_stack {
+		menu.update(e)
+	}
+}
+
 fn frame(mut app ctx.App) {
 	app.width, app.height = term.get_terminal_size()
 	app.menu_stack[ctx.UILayers.prompt].width, app.menu_stack[ctx.UILayers.prompt].height = app.width,
@@ -68,6 +72,7 @@ fn frame(mut app ctx.App) {
 
 	app.tui.clear()
 
+	// TODO: Streamline prompt
 	print_prompt(mut app)
 	for _, mut menu in app.menu_stack {
 		menu.draw(mut app.tui)
@@ -79,6 +84,7 @@ fn frame(mut app ctx.App) {
 	term.set_cursor_position(term.Coord{
 		app.width / 2 - app.prompt.lines[app.prompt.cursor_line].len / 2 + app.prompt.cursor_column,
 		app.height / 2 + app.prompt.cursor_line})
+	// Technically, cursor should already be showing.
 	term.show_cursor()
 }
 
@@ -110,6 +116,7 @@ fn make_prompt_ui() menu.SuperContainer {
 	ui_box.items << &menu.BasicButton{
 		label: test_label
 		input: .tab
+		press: slide_panel
 	}
 	return &menu.Container{
 		x: 0
@@ -175,4 +182,6 @@ struct SidePanel {
 	// TODO: Acceleration / Velocity
 }
 
-fn slide_panel(mut panel menu.Container) {}
+fn slide_panel() {
+	// panic('n')
+}
