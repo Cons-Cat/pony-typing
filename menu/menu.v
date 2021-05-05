@@ -5,7 +5,7 @@ import term.ui as tui
 
 pub interface DrawableItems {
 	draw(&tui.Context, int, int)
-	update(&tui.Event)
+	update(&tui.Event, ...voidptr)
 }
 
 pub struct Label {
@@ -23,7 +23,7 @@ pub fn (l Label) draw(mut ctx tui.Context, x int, y int) {
 	ctx.draw_text(x, y, text)
 }
 
-fn (l Label) update(e &tui.Event) {}
+fn (l Label) update(e &tui.Event, args ...voidptr) {}
 
 pub interface Button {
 	// press fn ()
@@ -42,15 +42,14 @@ pub interface Button {
 
 pub struct BasicButton {
 pub mut:
-	// press fn (mut voidptr)
-	press fn ()
+	press fn (...voidptr)
 	label Label
 	input tui.KeyCode
 }
 
-pub fn (mut b BasicButton) update(e &tui.Event) {
+pub fn (mut b BasicButton) update(e &tui.Event, args ...voidptr) {
 	if e.code == b.input {
-		b.press()
+		b.press(args)
 	}
 }
 
@@ -123,16 +122,16 @@ pub fn (c Container) draw(mut ctx tui.Context) {
 	}
 	// TODO: Account for layout
 	mut y_offset := 1
-	for i, box in c.boxes {
+	for _, box in c.boxes {
 		box.draw(mut ctx, c.x, c.y + y_offset, c.width, c.height - y_offset)
 		y_offset += box.items.len + 1
 	}
 }
 
-pub fn (c Container) update(e &tui.Event) {
+pub fn (c Container) update(e &tui.Event, args ...voidptr) {
 	for box in c.boxes {
 		for item in box.items {
-			item.update(e)
+			item.update(e, args)
 		}
 	}
 }
@@ -146,5 +145,5 @@ mut:
 	layout Layout
 	boxes []&Box
 	draw(mut ctx tui.Context)
-	update(&tui.Event)
+	update(&tui.Event, ...voidptr)
 }

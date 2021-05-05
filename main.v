@@ -15,10 +15,10 @@ fn main() {
 	mut prompt_container := make_prompt_ui()
 	prompt_container.width, prompt_container.height = term.get_terminal_size()
 
-	// mut sidebar_container := make_sidebar_ui()
-	// _, sidebar_container.height = term.get_terminal_size()
-	// sidebar_container.x = -sidebar_container.width
-	mut sidebar_container := menu.SuperContainer(menu.Container{})
+	mut sidebar_container := make_sidebar_ui()
+	_, sidebar_container.height = term.get_terminal_size()
+	sidebar_container.x = -sidebar_container.width/2
+	// mut sidebar_container := menu.SuperContainer(menu.Container{})
 
 	// Instantiate context.
 	mut app := &ctx.App{
@@ -165,7 +165,7 @@ fn make_sidebar_ui() menu.SuperContainer {
 		type_box,
 		tab_box,
 	]
-	return &menu.Container{
+	return &SidePanel{
 		x: 0
 		y: 0
 		width: 20
@@ -178,10 +178,23 @@ fn make_sidebar_ui() menu.SuperContainer {
 
 struct SidePanel {
 	menu.Container
+mut:
 	toggle bool
 	// TODO: Acceleration / Velocity
 }
 
-fn slide_panel() {
-	// panic('n')
+fn (mut sp SidePanel) update(e &tui.Event, args ...voidptr) {
+	// panic('a')
+	if sp.toggle {
+		sp.x += 2
+	}
+	for box in sp.boxes{
+		for item in box.items{
+			item.update(e,args)
+		}
+	}
+}
+
+fn slide_panel(args ...voidptr) {
+	(&SidePanel(args[0])).toggle = true
 }
