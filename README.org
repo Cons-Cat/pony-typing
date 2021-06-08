@@ -1,3 +1,5 @@
+*edit*: I've given up on this for the time being, for several reasons, all of which relate to the fact that V is in version 0.2.x. The termainal library sucks, the compiler sucks, the tooling sucks, etc. I'm sure it'll get better, and then I may pick this back up.
+
 This is an early WIP touch-typing program written in V. I envision it as a cross-platform (Win10/GNU/Mac) console application.
 It should render images with multiple supported protocols (sixel, Kitty, w3m, iterm's, etc.).
 The typing interfaces should be inspired by keybr.com, monkeytype.com, and typingclub.com
